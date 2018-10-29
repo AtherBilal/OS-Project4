@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -std=gnu99
-EXECUTABLES=oss child
+EXECUTABLES=oss proc
 HELPERFILES= src/validation.c
 all: $(EXECUTABLES)
 
@@ -9,7 +9,7 @@ oss: src/oss.c
 	touch bin/CreateKeyFile
 	touch bin/log
 	$(CC) $(CFLAGS) $< $(HELPERFILES) -o bin/$@
-child:src/child.c
+proc: src/proc.c
 	$(CC) $(CFLAGS) $< $(HELPERFILES) -o bin/$@
 clean:
 	rm -rf bin/
