@@ -1,0 +1,12 @@
+I was unable to implement every aspect of this project. I decided instead to do the parts that I do understand, hand that in
+then re-do this project at the end of the semester.
+
+Here's what I do have implented
+
+* Version Control
+* README file
+* Signal Handling
+* Message queues
+* Logging (although the logs mean nothing)
+* Makefile
+* PCB definition
