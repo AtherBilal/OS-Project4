@@ -12,3 +12,10 @@ Here's what I do have implented
 * PCB definition
 * clearing share memory
 
+To run please run the following commands (in the root directory)
+make
+cd bin
+./oss
+
+to see version control history run (in the root directory)
+cat .gitlog
