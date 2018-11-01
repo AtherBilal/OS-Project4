@@ -10,3 +10,5 @@ Here's what I do have implented
 * Logging (although the logs mean nothing)
 * Makefile
 * PCB definition
+* clearing share memory
+

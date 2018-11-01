@@ -3,5 +3,9 @@
 // union semun {
 //     int val;
 // };
+struct msgBuf {
+   long mtype;
+   char mtext[200];
+};
 extern int isNumber(char* str);
 #endif

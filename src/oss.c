@@ -28,6 +28,7 @@ typedef struct
 char* log_filename;
 FILE* logFilePointer = NULL;
 
+
 // shared memory
 int shmClockId;
 int shmBlockId;
@@ -35,12 +36,6 @@ int shmQueueId;
 int msgQueueId;
 void* shmClockAddress;
 void* shmMsgAddress;
-int maxRunTime = -1;
-//Semaphore
-int semID;
-// union semun {
-//     int val;
-// };
 void handleCtrlC();
 void closeFilePointers();
 void deallocateMemory();
@@ -54,7 +49,9 @@ int main(int argc, char *argv[]){
     signal(SIGINT, handleCtrlC);
 
     //allocate shared memory
+    logFilePointer = fopen("logfile", "w");
 
+    struct msgBuf buf;
     key_t shmClockKey = ftok("./CreateKeyFile", 1);
     key_t shmBlockKey = ftok("./CreateKeyFile", 2);
     key_t shmQueueKey = ftok("./CreateKeyFile", 3);
@@ -66,16 +63,27 @@ int main(int argc, char *argv[]){
     shmQueueId = shmget(shmQueueKey, sizeof(long) * 19, IPC_CREAT | 0644);
     msgQueueId = msgget(msgQueueKey, IPC_CREAT | 0644);
     checkForErrors(argv[0], errno);
+    int pid = fork();
+    if (pid == 0) {
+        execl("./proc", "proc", NULL);
+    }
 
 
     //NOTE: Gave up around this point. I am going to try to implement message queues for the next project
-    // printf("creating semaphore\n");
-    // semID = semget(semKey, 1, IPC_CREAT | 0666);
-    // checkForErrors(argv[0], errno);
-    // union semun semArg;
-    // semArg.val = 1;
-    // semctl(semID, 0, SETVAL, semArg);
-
+    for(;;) { 
+        if (msgrcv(msgQueueId, &buf, sizeof(buf.mtext), 0, 0) == -1) {
+            perror("msgrcv");
+            exit(1);
+        }
+        fprintf(logFilePointer,"HELLO POINTER");
+        printf("recieved from child!: \"%s\"\n", buf.mtext);
+        wait(NULL);
+        if (msgctl(msgQueueId, IPC_RMID, NULL) == -1) {
+            perror("msgctl");
+            exit(1);
+        }
+        break;
+    }
     deallocateMemory();
     return 0;
 }
@@ -103,10 +111,8 @@ void deallocateMemory() {
     shmctl(shmQueueId, IPC_RMID, NULL);
   if (shmBlockId)
     shmctl(shmBlockId, IPC_RMID, NULL);
-//   if (shmClockAddress){
-//     shmdt(shmClockAddress);
-//   }
-//   semctl(semID, 0, IPC_RMID);
+  if(msgQueueId)
+    msgctl(msgQueueId, IPC_RMID, NULL);
 }
 
 void closeFilePointers() {
